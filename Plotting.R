@@ -1660,6 +1660,7 @@ New_df$flii <- ifelse(New_df$flii <0 , 0, New_df$flii)
 
 saveRDS(New_df, paste(directory, "/Region_covariates.Rdata", sep = ""))
 
+#load in New DF so it doesnt have to be recalculated
 New_df <- readRDS(paste(directory, "/Region_covariates.Rdata", sep = ""))
 
 tic()
@@ -1714,112 +1715,6 @@ custom_colors <- #c("#8E0152", "#C51B7D", "#DE77AE", "#F1B6DA", "#FDE0EF",
 c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#FFFFBF",  "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")
 
 
-testsp <- st_read("Input_data/Species_of_National_Environmental_Significance_and_selected_marine_and_cetacean_species/Species_of_National_Environmental_Significance_and_selected_marine_and_cetacean_species.shp")
-
-# pot_1_plot <- ggplot() +
-#   
-#   geom_point(data = pot_trid_1, shape = "circle", size = 1.5, aes(x = long, y = lat, colour = Predicted)) +
-#   scale_color_gradientn(colors = custom_colors, limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
-#   # geom_point(data = site_cov, aes(x = longitude, y = latitude), shape = 1, size = 3, color = "black") +
-#   geom_sf(data = testsp , fill=NA, colour = "black", size=1.5)+
-#   geom_sf(data(st_buffer(testsp_filtered, dist = 0.01) %>% filter(LISTED_TAX == 217, PRESENCE_R == 2)))
-#   theme(axis.title = element_blank(), 
-#         axis.text = element_blank(),
-#         axis.ticks = element_blank(),
-#         panel.grid = element_blank(),
-#         panel.border = element_blank(),
-#         axis.line = element_blank())+
-#   xlim(c(E_Gips_box$xmin,E_Gips_box$xmax))
-  
-  
-  # # Recheck validity after simplifying
-  # testsp_filtered <- st_make_valid(testsp_filtered)
-  # 
-  # # Create a buffer around the geometries in testsp_filtered
-  # testsp_buffer <- st_buffer(testsp_filtered, dist = 0.01)  
-  
-  # Filter and buffer the `testsp` data
-  testsp_filtered <- testsp %>% filter(LISTED_TAX == 217, PRESENCE_R == 2)
-  testsp_buffer <- st_buffer(testsp_filtered %>% filter(LISTED_TAX == 217, PRESENCE_R == 2), dist = 0.01)  # Adjust the distance as needed
-  
-  # Create the plot
-  pot_1_plot <-  ggplot() +
-    geom_point(data = pot_trid_1, aes(x = long, y = lat, colour = Predicted), shape = 16, size = 1.5) +
-    scale_color_gradientn(colors = custom_colors, limits = c(0, 1), breaks = seq(0, 1, by = 0.2)) +
-    # Uncomment the next line if you need to plot points from site_cov
-    geom_point(data = site_cov, aes(x = longitude, y = latitude), shape = 1, size = 3, color = "black") +
-  
-    geom_sf(data = testsp_filtered, fill = NA, colour="white", size = 4, linewidth=2, alpha=0.2) +  # Buffer with shading
-    geom_sf(data = testsp_filtered, fill = NA, colour = "black", linewidth = 1, alpha=0.2) +  # Original geometries
-    theme(axis.title = element_blank(), 
-          axis.text = element_blank(),
-          axis.ticks = element_blank(),
-          panel.grid = element_blank(),
-          panel.border = element_blank(),
-          axis.line = element_blank(),plot.margin = unit(c(0, 0, 0, 0.01), "cm")) +
-    theme_void() +
-    coord_sf(xlim=c(E_Gips_box$xmin, E_Gips_box$xmax),
-    ylim=c(E_Gips_box$ymin, E_Gips_box$ymax))
-  
-  # pot_1_plot_fire <- ggplot(data = pot_trid_1)+
-  #   geom_boxplot(aes(x=New_df$fire_sev_infield, y=Predicted))
-  # 
-  # pot_1_plot_elv <- ggplot(data = pot_trid_1)+
-  #   geom_point(aes(x=New_df$elevation, y=Predicted))
-  # 
-  # pot_1_plot_flii <- ggplot(data = pot_trid_1)+
-  #   geom_point(aes(x=New_df$flii, y=Predicted))
-  # 
-  # pot_1_plot_rain<- ggplot(data = pot_trid_1)+
-  #   geom_point(aes(x=New_df$Avg_mnth_tot_rain, y=Predicted))
-  # 
-  # pot_1_plot_ndvi <- ggplot(data = pot_trid_1)+
-  #   geom_point(aes(x=New_df$Avg_mnth_ndvi, y=Predicted))
-  # 
-  # pot_1_plot | (pot_1_plot_fire / pot_1_plot_elv / pot_1_plot_flii / pot_1_plot_rain / pot_1_plot_ndvi)
-  # 
-  # column_plots <- pot_1_plot_fire / pot_1_plot_elv / pot_1_plot_rain 
-  # 
-  # # Combine pot_1_plot and the vertical column of plots into two columns
-  # combined_plot <- pot_1_plot | column_plots
-
-pot_2_plot <- ggplot(data = pot_sp_2) +
-  aes(x = long, y = lat, colour = Predicted) +
-  geom_point(shape = "circle", size = 1.5) +
-  scale_color_gradientn(colors = custom_colors, limits = c(0, 1), breaks = seq(0, 1, by = 0.2)) +
-  geom_point(data = site_cov, aes(x = longitude, y = latitude), shape = 1, size = 3, color = "black") +
-  theme(axis.title = element_blank(), 
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid = element_blank(),
-        panel.border = element_blank(),
-        axis.line = element_blank())+
-  xlim(c(E_Gips_box$xmin,E_Gips_box$xmax))
-
-filtered_data <- testsp %>% filter(LISTED_TAX == 217)
-
-# Create the plot using ggplot2
-ggplot() +
-  geom_sf(data = filtered_data) +
-  theme_minimal() +
-  
-  labs(title = "Map of Filtered Data",
-       subtitle = "Filtered by LISTED_TAX == 217")
-
-
-ggplot(data = New_df) +
-  aes(x = longitude, y = latitude, colour = flii) +
-  geom_point(shape = "circle", size = 1.5) +
-  scale_color_gradientn(colors = custom_colors, limits = c(0, 1), breaks = seq(0, 1, by = 0.1)) +
-  geom_point(data = site_cov, aes(x = longitude, y = latitude), shape = 1, size = 3, color = "black") +
-  theme(axis.title = element_blank(), 
-        axis.text = element_blank(),
-        axis.ticks = element_blank(),
-        panel.grid = element_blank(),
-        panel.border = element_blank(),
-        axis.line = element_blank())
-
-#load in shape file for the knwo area of each potorous species
 
 pot_species <- st_read("Input_Data/Species_of_National_Environmental_Significance_and_selected_marine_and_cetacean_species/Species_of_National_Environmental_Significance_and_selected_marine_and_cetacean_species.shp")
 
@@ -1829,6 +1724,11 @@ pot_species_combined <- pot_species %>%
     LISTED_TAX == 86367 ~ "P.tridactylus",
     LISTED_TAX == 217 ~ "P.longipes"
   ))
+
+saveRDS(pot_species_combined, paste(directory,"Range_Potoroos.Rdata", sep = "/"))
+
+# read in file:
+pot_species_combined <- readRDS(paste(directory,"Range_Potoroos.Rdata", sep = "/"))
 
 # Create the first plot
 pot_1_plot <- 
